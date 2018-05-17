@@ -1,0 +1,70 @@
+﻿GameOfThreads - Team 27 Bug Log
+        Team Members:
+                Kenneth Adriatico - adriatc2
+                Michael Roatis -  roatis2
+                Ivan Gallardo - igalla3
+                Chris Wegenek - wegenek2
+                
+Checkpoint 1:
+
+
+        Going about Checkpoint 1 was fairly easy. A long array was created for keyboard inputs in order to reach character symbols faster. 
+	Ran into bugs regarding assembly portions of paging where cr3, cr4, and cr5 registers weren't saving correctly. 
+	Also at a time, paging was done in reverse order where cr3,cr4, and cr5 registers were initialized first before enabling page and page extension. 
+	These were later resolved by placing functions in correct order in kernel.c.
+
+
+
+
+Checkpoint 2:
+
+
+        Around Checkpoint 2, there were big issues with the file system primarily. There was confusion over implementation of PCB blocks and what is actually needed for testing. 
+	The helper functions for the file system, read_dentry_by_name and read_dentry_by_index, were done in such a way that they would pass the checkpoint tests, but overall were incomplete. 
+	We implemented correctly for the checkpoint read_dentry_by_name because we were able to print the current working directory, however, we had to change up the method for it to work for later checkpoints. 
+	The issue with read_data was that information was being loaded from the first data block and not subsequent blocks if there was more than one it would not be read or printed. 
+	The string function strcmp was understood incorrectly since it returns 0 instead of 1 which messed up our conditions. 
+	Also, the math implemented to memcpy the correct bytes was incorrect as well resulting in more data being copied than was actually there or not enough of it being copied. 
+	This issue was not resolved in time for this Checkpoint. There was also a PIC EOI problem. We were not sending an EOI for the port on the master that the slave was connected to when a slave port received an EOI from one of the devices which caused small bugs in our code. 
+	This was resolved by Chris and Ivan. 
+
+
+
+
+Checkpoint 3:
+        
+	Checkpoint 3 was the most difficult so far. Issues from read_data from last checkpoint was solved after correctly fixing issued described in Checkpoint 2. 
+	This was fixed by Kenneth. We noticed this but when we noticed that read_data worked when asking to read a smaller number of bytes, however, crashed when asking to read larger amounts of information. 
+	The reason we did not notice this with frame0.txt in checkpoint 2 was because only one data block was necessary to test this, however, a larger program like execute used multiple data blocks. 
+	This was the biggest bug that we had with execute for this checkpoint. The inability to execute a program for the majority of the project time left us unable to fully implement the remaining system calls and test them in a context similar to demo conditions.
+
+
+
+
+Checkpoint 4:
+
+
+        In Checkpoint 4, our primary issue was grep and cat rtc. We believed that our implementation with grep was correct, however, there were some test cases which we missed in order to fully get points for grep. 
+	These issues were not resolved until next checkpoint because these issues were found during demoing. Most small bugs were resolved by implementing certain error checking in the functions being called. 
+	Dealing with syserr took a while as well. Ivan resolved multiple syserr issues by fixing and cleaning up error conditions. 
+	We had a memory corruption problem in one of the syscalls due to incorrectly initiating a pcb pointer as a pcb struct object resulting in the memory not being overwritten as expected and later accessing that garbage information resulting in either page faulting or general protection errors. 
+	This issue was resolved by Michael.
+
+
+
+
+Checkpoint 5:
+        
+        Fixed issues with grep and cat rtc by fixing edge cases and error checking conditions in read_data.(Kenneth) 
+	Ivan fixed a bug with the keyboard buffer not ending in a newline character by adding the character to the buffer when enter is pressed and adjusting the limit on the number of bytes written in terminal_write.
+ 	
+	For Checkpoint 5, our biggest issue was scheduling.
+        Switching terminals 3 times leads to a page fault. Implementation of terminal_switch causes a page fault on the third switch but cause is unknown as all variable values seem correct in GDB. 
+	Fixed by removing the context switch stuff which is no longer necessary as PIT handles that.(Fixed by Ivan)
+	
+	Terminals 2 and 3 could only run a process so long as a process was running in Terminal 1.By the time Terminal 1 finishes, Terminals 2 and 3 would pause in the middle of their processes. 
+	This was a result of page faulting brought on by PIT and Halt. Properly setting the head process PID in each terminal when halting resolved this issue. (Fixed by Ivan)
+	
+	Processes which rely on RTC slow down significantly when being run on multiple terminals. This issue was due to the rtc interrupt flag being set and cleared at improper times causing
+	a process to block until an rtc interrupt occured which led to the process lag. Ivan fixed this by adding individual flags for each terminal to clear independently.
+ 

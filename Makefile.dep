@@ -1,0 +1,20 @@
+boot.o: boot.S multiboot.h x86_desc.h types.h
+Wrappers.o: Wrappers.S x86_desc.h types.h
+x86_desc.o: x86_desc.S x86_desc.h types.h
+filesystem.o: filesystem.c filesystem.h types.h syscall.h rtc.h i8259.h \
+  tests.h lib.h
+i8259.o: i8259.c i8259.h types.h lib.h
+IDT.o: IDT.c IDT.h x86_desc.h types.h lib.h keyboard.h Wrappers.h \
+  syscall.h rtc.h i8259.h tests.h filesystem.h
+kernel.o: kernel.c multiboot.h types.h x86_desc.h lib.h i8259.h debug.h \
+  tests.h Wrappers.h keyboard.h IDT.h rtc.h paging.h filesystem.h \
+  syscall.h
+keyboard.o: keyboard.c keyboard.h types.h lib.h i8259.h
+lib.o: lib.c lib.h types.h rtc.h i8259.h tests.h keyboard.h
+paging.o: paging.c paging.h lib.h types.h syscall.h rtc.h i8259.h tests.h \
+  filesystem.h
+rtc.o: rtc.c i8259.h types.h tests.h lib.h rtc.h
+syscall.o: syscall.c syscall.h types.h rtc.h i8259.h tests.h lib.h \
+  filesystem.h x86_desc.h keyboard.h paging.h IDT.h
+tests.o: tests.c tests.h x86_desc.h types.h lib.h rtc.h i8259.h \
+  keyboard.h filesystem.h syscall.h
